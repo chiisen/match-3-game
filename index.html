@@ -19,6 +19,16 @@
 
 <body>
     <div class="game-container">
+        <!-- 模式選擇 (移至頂部兩角) -->
+        <div class="mode-selector top-nav">
+            <button class="btn btn-mode active" id="btn-classic" data-mode="classic">
+                ♾️ 經典模式
+            </button>
+            <button class="btn btn-mode" id="btn-timed" data-mode="timed">
+                ⏱️ 計時模式
+            </button>
+        </div>
+
         <header class="game-header">
             <h1 class="game-title">
                 <span class="title-gem">🐾</span> Match-3
@@ -61,14 +71,6 @@
 
         <!-- 控制按鈕區 -->
         <div class="controls">
-            <div class="mode-selector">
-                <button class="btn btn-mode active" id="btn-classic" data-mode="classic">
-                    ♾️ 經典模式
-                </button>
-                <button class="btn btn-mode" id="btn-timed" data-mode="timed">
-                    ⏱️ 計時模式
-                </button>
-            </div>
             <div class="action-buttons">
                 <button class="btn btn-secondary" id="btn-sound">
                     🔊 音效: 開

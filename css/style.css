@@ -336,15 +336,30 @@ body {
     /* 讓按鈕平均分配空間 */
 }
 
-/* 按鈕 active 狀態（手機觸控回饋） */
-.btn:active {
-    transform: scale(0.96);
-    opacity: 0.85;
+/* ---------- 模式導覽 (頂部兩角) ---------- */
+.mode-selector.top-nav {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: -10px;
+    /* 拉近與標題的距離 */
+    position: relative;
+    z-index: 5;
 }
 
-.btn-mode {
-    background: var(--bg-card);
-    color: var(--text-secondary);
+.mode-selector.top-nav .btn-mode {
+    flex: 0 0 auto;
+    min-width: 140px;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 12px 20px;
+    min-height: 52px;
+    background: rgba(26, 26, 62, 0.7);
+    border: 2px solid rgba(0, 229, 255, 0.2);
+    border-radius: 14px;
+    color: var(--accent-cyan);
+    /* 均使用青色字體 */
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
 }
 
 .btn-mode.active {
