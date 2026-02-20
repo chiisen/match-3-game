@@ -24,7 +24,7 @@ export class AudioManager {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (this.audioContext.state === 'suspended') {
-                this.audioContext.resume().catch(() => { }); // 忽略自動播放限制導致的失敗
+                this.audioContext.resume().catch(() => { });
             }
             return this.audioContext.state === 'running';
         } catch (e) {

@@ -35,6 +35,13 @@
   - **Cheer 狀態**：連鎖消除時開直接跳轉至 3s 播放至 8s。
 - **佈局**：位於控制區下方的 `.video-wrapper`，非絕對定位於 Canvas 上，以防遮擋操作。
 
+### 6. Web Audio 自動播放與 Console 門檻
+- **痛點**：瀏覽器禁止在無手勢下播放音訊，且嘗試 `resume()` 會在 Console 噴出大量 `AuditoContext not allowed` 警告。
+- **現行方案**：
+  - **移除自動啟動**：在 `main.js` 初始化時不再自動呼叫 `startBGM()`。
+  - **手勢捕獲**：使用 `['touchstart', 'mousedown', 'click']` 組合監聽器，一旦偵測到使用者第一次互動，才正式執行 `audioManager.init()` 與 `startBGM()`。
+  - **靜默初始化**：在 `audio.js` 的 `init()` 中加入狀態檢查，確保僅在 `suspended` 時嘗試 `resume()`，並確保該行為僅在互動回呼中發生。
+
 ### 5. 頂部導航與標題對齊 (Top-Nav Alignment)
 - **痛點**：標題與按鈕分散佔據多行，擠壓了棋盤顯示空間。
 - **現行方案**：將 `<header>` 嵌入到 `.mode-selector.top-nav` 中，使用 Flexbox `justify-content: space-between` 與 `align-items: center`。

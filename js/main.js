@@ -133,9 +133,6 @@ function init() {
         if (timerContainer) {
             timerContainer.style.display = mode === 'timed' ? 'flex' : 'none';
         }
-
-        // 啟動背景音樂 (需使用者互動後)
-        audioManager.startBGM();
     }
 
     // --- 綁定 UI 按鈕事件 ---
@@ -183,10 +180,15 @@ function init() {
     const unlockAudio = () => {
         if (audioManager.init()) {
             audioManager.startBGM(); // 解鎖後立即啟動背景音樂
+            // 移除所有解鎖監聽器
+            ['touchstart', 'mousedown', 'click'].forEach(evt =>
+                document.removeEventListener(evt, unlockAudio)
+            );
         }
     };
-    document.addEventListener('touchstart', unlockAudio, { once: true });
-    document.addEventListener('mousedown', unlockAudio, { once: true });
+    ['touchstart', 'mousedown', 'click'].forEach(evt =>
+        document.addEventListener(evt, unlockAudio)
+    );
 
     // 手機旋轉（延遲確保 innerWidth/innerHeight 已更新）
     window.addEventListener('orientationchange', () => {
