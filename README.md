@@ -34,6 +34,12 @@
 - **影片區段控制**：改用 `cheer.mp4` 影片，透過 JS 監聽 `timeupdate` 實作狀態機。平時在 1s~2.5s 循環，三消觸發後瞬間跳至 3s 播放至 8s。
 - **獨立佈局區塊**：將影片從棋盤內部移至控制按鈕區下方的獨立 `.video-wrapper` 區域，解決遮擋問題並使整體視覺更飽滿。
 
+### 3. 頂部導航與標題整合
+**問題描述**：原本模式切換按鈕位於底部，且標題佔據獨立行，導致棋盤以上的空間利用率較低，且操作重心過於分散。
+**解決方案**：
+- **水平整合佈局**：將遊戲標題與兩個模式按鈕（左經典、右計時）整合至同一水平行。透過 Flexbox 實現對稱佈局，提升了介面的緊湊感與專業度。
+- **視覺強化**：將模式按鈕高度提升至 `52px`，字體顏色統一為 `accent-cyan`，並賦予強烈的霓虹發光效果，使其在功能與視覺上都成為頂部的核心。
+
 ## 🚀 快速開始
 1. 確保電腦已安裝 [Node.js](https://nodejs.org/)。
 2. 使用 VS Code 的 [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 或以下指令開啟本機服務：
@@ -48,4 +54,4 @@
    ```
 
 ---
-*Created by [chiisen](https://github.com/chiisen) — v0.2.1*
+*Created by [chiisen](https://github.com/chiisen) — v0.2.2*
