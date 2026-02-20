@@ -76,20 +76,24 @@ export class Renderer {
         this._calcDimensions();
     }
 
-    /** 計算尺寸：以螢幕寬度為主要依據，讓棋盤填滿水平空間 */
+    /** 計算尺寸：透過真正 RWD，CSS 負責外部畫面大小縮放，JS 這裡只負責決定內部畫布的高解析畫質！ */
     _calcDimensions() {
-        const sidePad = 10;
-        // 直接以螢幕寬度決定棋盤大小，不再被高度壓縮
-        const maxSize = Math.min(window.innerWidth - sidePad * 2, 800);
-        this.cellSize = Math.floor(maxSize / this.boardSize);
-        this.padding = 0;
+        // 固定為高清內部解析度 840 x 840（可被 6, 7, 8 等多種網格完美整除，且不管螢幕大小，圖案絕對清晰不糊）
+        const internalSize = 840;
+
+        this.cellSize = Math.floor(internalSize / this.boardSize);
+        this.padding = 0; // 邊距為 0 使圖片長滿網格
         this.gemSize = this.cellSize;
 
-        const canvasSize = this.cellSize * this.boardSize;
+        const canvasSize = internalSize;
         this.canvas.width = canvasSize;
         this.canvas.height = canvasSize;
-        this.canvas.style.width = canvasSize + 'px';
-        this.canvas.style.height = canvasSize + 'px';
+
+        // 刪除 JS 對元素實際長寬 px 的硬性死板限制！我們已經在 style.css 中
+        // 設定了 `#game-canvas { width: 100%; height: 100%; }` // .canvas-wrapper { max-width: 600px; aspect-ratio: 1/1; }
+        // 這樣在不同手機/螢幕，無論直向橫向都會自適應剛好的大小
+        this.canvas.style.width = '100%';
+        this.canvas.style.height = '100%';
     }
 
     /** 螢幕座標 → 棋盤座標 */

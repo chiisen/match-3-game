@@ -194,13 +194,17 @@ body {
         0 0 80px rgba(255, 0, 229, 0.05),
         0 10px 40px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    /* 讓外框剛好包住 Canvas，不多不少，消除右側空白 */
-    width: fit-content;
-    max-width: 100%;
+    /* 讓外框擁有 RWD 能力，自動填滿但保持最大限制與正方形 */
+    width: 100%;
+    max-width: 600px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
 }
 
 #game-canvas {
     display: block;
+    width: 100%;
+    height: 100%;
     cursor: pointer;
     background: var(--bg-secondary);
     /* 防止 iOS 觸控選取 */
