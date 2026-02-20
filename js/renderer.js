@@ -68,17 +68,26 @@ export class Renderer {
         this._calcDimensions();
     }
 
-    /** 計算尺寸 */
+    /** 計算尺寸：同時考慮寬度與高度，取較小值 */
     _calcDimensions() {
-        // 根據視窗大小計算適當的格子尺寸
-        const maxWidth = Math.min(window.innerWidth - 48, 480);
-        this.cellSize = Math.floor(maxWidth / this.boardSize);
+        const sidePad = 20; // 左右 padding
+        const maxByWidth = Math.min(window.innerWidth - sidePad * 2, 480);
+
+        // 估算 UI 其他元素佔用的垂直空間（標題+計分板+按鈕+gap）
+        // 手機直向：約佔 180px；橫向下由 CSS flex 處理，此處取保守值
+        const uiHeight = window.innerHeight < 600 ? 140 : 180;
+        const availH = window.innerHeight - uiHeight;
+        const maxByHeight = Math.max(availH, 200); // 最小保留 200px
+
+        const maxSize = Math.min(maxByWidth, maxByHeight);
+        this.cellSize = Math.floor(maxSize / this.boardSize);
         this.padding = 4;
         this.gemSize = this.cellSize - this.padding * 2;
 
         const canvasSize = this.cellSize * this.boardSize;
         this.canvas.width = canvasSize;
         this.canvas.height = canvasSize;
+        // CSS 讓 canvas 跟容器等寬，但保留 aspect-ratio
         this.canvas.style.width = canvasSize + 'px';
         this.canvas.style.height = canvasSize + 'px';
     }

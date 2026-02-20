@@ -1,5 +1,5 @@
 /* ============================================================
-   Match-3 Game — 深色主題樣式表
+   Match-3 Game — 深色主題樣式表（手機優化版）
    ============================================================ */
 
 /* ---------- CSS 自訂屬性 ---------- */
@@ -26,6 +26,10 @@
     --transition-speed: 0.3s;
 
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* 手機 safe-area 支援 (iPhone 瀏海/底部手勢列) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ---------- Reset & Base ---------- */
@@ -35,26 +39,43 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    /* 防止觸控長按選取文字 */
+    -webkit-user-select: none;
+    user-select: none;
+    /* 移除 iOS 觸控高亮 */
+    -webkit-tap-highlight-color: transparent;
 }
 
 html {
     font-size: 16px;
+    /* 防止 iOS Safari 字型自動縮放 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
     font-family: var(--font-primary);
     background: var(--bg-primary);
     color: var(--text-primary);
+    /* 使用 dvh (dynamic viewport height) 解決 iOS Safari 位址列問題 */
+    min-height: 100dvh;
     min-height: 100vh;
+    /* fallback */
     display: flex;
     justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    /* 動態背景 */
+    align-items: flex-start;
+    /* 允許縱向捲動，防止畫面被截斷 */
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* 動態漸層背景 */
     background-image:
         radial-gradient(ellipse at 20% 50%, rgba(0, 229, 255, 0.06) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 50%, rgba(255, 0, 229, 0.06) 0%, transparent 50%),
         radial-gradient(ellipse at 50% 100%, rgba(255, 215, 0, 0.04) 0%, transparent 50%);
+    background-attachment: fixed;
+    /* 支援 iPhone safe-area */
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
 }
 
 /* ---------- 遊戲容器 ---------- */
@@ -62,20 +83,21 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 24px;
+    /* 使用 CSS var 動態注入，由 JS 控制間距 */
+    gap: 10px;
+    padding: 12px 12px;
     max-width: 560px;
     width: 100%;
+    margin: 0 auto;
 }
 
 /* ---------- 標題 ---------- */
 .game-header {
     text-align: center;
-    margin-bottom: 4px;
 }
 
 .game-title {
-    font-size: 2.4rem;
+    font-size: 2rem;
     font-weight: 900;
     letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
@@ -83,22 +105,30 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.3));
+    line-height: 1.1;
 }
 
 .title-gem {
     -webkit-text-fill-color: initial;
-    font-size: 2rem;
+    font-size: 1.7rem;
     display: inline-block;
     animation: gemFloat 2s ease-in-out infinite;
 }
 
 @keyframes gemFloat {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-5px) rotate(10deg); }
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-4px) rotate(10deg);
+    }
 }
 
 .game-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -108,43 +138,44 @@ body {
 /* ---------- 計分板 ---------- */
 .scoreboard {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    /* 強制單行，避免換行 */
 }
 
 .score-item {
     background: var(--bg-card);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: var(--border-radius);
-    padding: 10px 18px;
+    border-radius: 10px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-width: 90px;
-    transition: all var(--transition-speed) ease;
-}
-
-.score-item:hover {
-    background: var(--bg-card-hover);
-    border-color: rgba(255, 255, 255, 0.1);
+    flex: 1;
+    /* 均分空間，不溢出 */
+    min-width: 0;
+    /* 允許 flex 子項縮小 */
+    transition: background var(--transition-speed) ease;
 }
 
 .score-label {
-    font-size: 0.7rem;
+    font-size: 0.62rem;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    white-space: nowrap;
 }
 
 .score-value {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--accent-cyan);
     text-shadow: var(--glow-cyan);
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .score-value.pop {
@@ -161,14 +192,23 @@ body {
     box-shadow:
         0 0 40px rgba(0, 229, 255, 0.1),
         0 0 80px rgba(255, 0, 229, 0.05),
-        0 20px 60px rgba(0, 0, 0, 0.5);
+        0 10px 40px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    /* 讓寬度跟著容器 */
+    width: 100%;
+    align-self: stretch;
 }
 
 #game-canvas {
     display: block;
+    /* 寬度填滿容器，高度由 JS 設定 */
+    width: 100%;
+    height: auto;
     cursor: pointer;
     background: var(--bg-secondary);
+    /* 防止 iOS 觸控選取 */
+    -webkit-touch-callout: none;
+    touch-action: none;
 }
 
 /* ---------- 遊戲結束覆蓋層 ---------- */
@@ -180,6 +220,7 @@ body {
     height: 100%;
     background: rgba(10, 10, 26, 0.92);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -188,35 +229,40 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .overlay-content {
     text-align: center;
-    padding: 32px;
+    padding: 24px 20px;
 }
 
 .overlay-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 900;
     background: linear-gradient(135deg, var(--accent-gold), var(--accent-magenta));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .overlay-score {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: var(--text-secondary);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 
 .overlay-score span {
     color: var(--accent-cyan);
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     text-shadow: var(--glow-cyan);
 }
 
@@ -224,7 +270,7 @@ body {
 .controls {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     align-items: center;
 }
@@ -232,36 +278,45 @@ body {
 .mode-selector {
     display: flex;
     gap: 8px;
+    width: 100%;
 }
 
 .action-buttons {
     display: flex;
     gap: 8px;
+    width: 100%;
 }
 
-/* ---------- 按鈕 ---------- */
+/* ---------- 按鈕（手機觸控最佳化） ---------- */
 .btn {
     font-family: var(--font-primary);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     font-weight: 600;
-    padding: 10px 20px;
+    /* 手機觸控目標最小高度 44px (Apple HIG) */
+    min-height: 44px;
+    padding: 10px 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all var(--transition-speed) ease;
     outline: none;
     letter-spacing: 0.02em;
+    /* 觸控回饋 */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    flex: 1;
+    /* 讓按鈕平均分配空間 */
+}
+
+/* 按鈕 active 狀態（手機觸控回饋） */
+.btn:active {
+    transform: scale(0.96);
+    opacity: 0.85;
 }
 
 .btn-mode {
     background: var(--bg-card);
     color: var(--text-secondary);
-}
-
-.btn-mode:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.15);
 }
 
 .btn-mode.active {
@@ -276,19 +331,15 @@ body {
     color: #fff;
     border: none;
     font-size: 1rem;
-    padding: 14px 32px;
+    min-height: 48px;
+    padding: 12px 32px;
     border-radius: var(--border-radius);
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.btn-primary:hover {
-    filter: brightness(1.15);
-    box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
-    transform: translateY(-2px);
-}
-
 .btn-primary:active {
-    transform: translateY(0);
+    filter: brightness(0.9);
+    transform: scale(0.97);
 }
 
 .btn-secondary {
@@ -296,51 +347,142 @@ body {
     color: var(--text-secondary);
 }
 
-.btn-secondary:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.15);
+/* ---------- 桌面端 hover 效果（手機無 hover） ---------- */
+@media (hover: hover) {
+    .score-item:hover {
+        background: var(--bg-card-hover);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-mode:hover {
+        background: var(--bg-card-hover);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary:hover {
+        filter: brightness(1.15);
+        box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-card-hover);
+        color: var(--text-primary);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
 }
 
-/* ---------- 響應式設計 ---------- */
-@media (max-width: 520px) {
+/* ---------- 手機直向（Portrait）主要斷點 ---------- */
+@media (max-width: 480px) {
     .game-container {
-        padding: 16px 12px;
-        gap: 12px;
+        gap: 8px;
+        padding: 8px 10px;
     }
 
     .game-title {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
 
-    .scoreboard {
-        gap: 8px;
-    }
-
-    .score-item {
-        padding: 8px 12px;
-        min-width: 70px;
+    .title-gem {
+        font-size: 1.4rem;
     }
 
     .score-value {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+    }
+
+    .score-label {
+        font-size: 0.58rem;
     }
 
     .btn {
-        font-size: 0.78rem;
-        padding: 8px 14px;
+        font-size: 0.82rem;
+        padding: 10px 10px;
     }
 }
 
-@media (max-width: 380px) {
+/* ---------- 極小螢幕（≤ 360px） ---------- */
+@media (max-width: 360px) {
+    .game-title {
+        font-size: 1.4rem;
+    }
+
+    .score-item {
+        padding: 6px 6px;
+    }
+
+    .score-value {
+        font-size: 1rem;
+    }
+
+    .btn {
+        font-size: 0.76rem;
+    }
+}
+
+/* ---------- 橫向（Landscape）模式 ---------- */
+@media (orientation: landscape) and (max-height: 500px) {
+    .game-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        max-width: 100%;
+        gap: 8px;
+        padding: 6px 12px;
+    }
+
+    .game-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: center;
+    }
+
+    .game-subtitle {
+        margin-top: 0;
+    }
+
+    .scoreboard {
+        width: auto;
+        flex: 0 0 auto;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .score-item {
+        flex: 0 0 auto;
+        flex-direction: row;
+        gap: 6px;
+        padding: 6px 10px;
+        min-height: 36px;
+    }
+
+    .score-label {
+        margin-bottom: 0;
+    }
+
+    .canvas-wrapper {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .controls {
+        width: auto;
+        flex: 0 0 auto;
+        gap: 6px;
+    }
+
     .mode-selector,
     .action-buttons {
         flex-direction: column;
-        width: 100%;
+        width: auto;
     }
 
-    .btn-mode,
-    .btn-secondary {
-        width: 100%;
+    .btn {
+        min-height: 36px;
+        font-size: 0.78rem;
+        white-space: nowrap;
     }
 }

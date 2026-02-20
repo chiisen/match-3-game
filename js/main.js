@@ -107,9 +107,14 @@ function init() {
         startGame(currentMode);
     });
 
-    // 視窗大小變更
+    // 視窗大小變更（桌面縮放）
     window.addEventListener('resize', () => {
         renderer.resize();
+    });
+
+    // 手機旋轉（延遲確保 innerWidth/innerHeight 已更新）
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => renderer.resize(), 100);
     });
 
     // 開始遊戲
