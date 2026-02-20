@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="網頁版三消遊戲 (Match-3 Game) — 經典休閒益智遊戲，即開即玩！">
+    <title>Match-3 Game — 三消遊戲</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">
+                <span class="title-gem">💎</span> Match-3
+            </h1>
+            <p class="game-subtitle">三消遊戲</p>
+        </header>
+
+        <!-- 計分板 -->
+        <div class="scoreboard">
+            <div class="score-item">
+                <span class="score-label">分數</span>
+                <span class="score-value" id="current-score">0</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">最高分</span>
+                <span class="score-value" id="high-score">0</span>
+            </div>
+            <div class="score-item" id="timer-container" style="display: none;">
+                <span class="score-label">時間</span>
+                <span class="score-value" id="timer">60</span>
+            </div>
+            <div class="score-item">
+                <span class="score-label">連鎖</span>
+                <span class="score-value" id="combo-count">0</span>
+            </div>
+        </div>
+
+        <!-- 遊戲畫布 -->
+        <div class="canvas-wrapper">
+            <canvas id="game-canvas"></canvas>
+            <!-- 遊戲結束覆蓋層 -->
+            <div class="overlay" id="game-over-overlay" style="display: none;">
+                <div class="overlay-content">
+                    <h2 class="overlay-title">遊戲結束</h2>
+                    <p class="overlay-score">最終分數：<span id="final-score">0</span></p>
+                    <button class="btn btn-primary" id="btn-restart-overlay">再玩一次</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制按鈕區 -->
+        <div class="controls">
+            <div class="mode-selector">
+                <button class="btn btn-mode active" id="btn-classic" data-mode="classic">
+                    ♾️ 經典模式
+                </button>
+                <button class="btn btn-mode" id="btn-timed" data-mode="timed">
+                    ⏱️ 計時模式
+                </button>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="btn-hint">
+                    💡 提示
+                </button>
+                <button class="btn btn-secondary" id="btn-restart">
+                    🔄 重新開始
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
