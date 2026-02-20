@@ -97,7 +97,8 @@ body {
 }
 
 .game-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
+    /* 縮小一點以容納在兩側按鈕中間 */
     font-weight: 900;
     letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
@@ -105,7 +106,7 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.3));
-    line-height: 1.1;
+    line-height: 1;
 }
 
 .title-gem {
@@ -340,11 +341,18 @@ body {
 .mode-selector.top-nav {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    /* 垂直置中 */
     width: 100%;
-    margin-bottom: -10px;
-    /* 拉近與標題的距離 */
+    margin-bottom: 6px;
     position: relative;
     z-index: 5;
+}
+
+.mode-selector.top-nav .game-header {
+    flex: 1;
+    text-align: center;
+    margin: 0 5px;
 }
 
 .mode-selector.top-nav .btn-mode {
