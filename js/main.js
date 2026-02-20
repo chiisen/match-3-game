@@ -58,7 +58,7 @@ function init() {
 
         cheerVideo.addEventListener('timeupdate', () => {
             if (cheerState === 'normal') {
-                if (cheerVideo.currentTime >= 2) {
+                if (cheerVideo.currentTime >= 2.5) {
                     cheerVideo.currentTime = 1;
                 }
             } else if (cheerState === 'cheer') {
