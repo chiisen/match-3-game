@@ -8,11 +8,14 @@ export class AudioManager {
         this.audioContext = null;
 
         // 從 localStorage 讀取設定，預設為開啟
-        const savedBgmMute = localStorage.getItem('match3_bgm_muted');
-        const savedSfxMute = localStorage.getItem('match3_sfx_muted');
-
-        this.bgmMuted = savedBgmMute === 'true';
-        this.sfxMuted = savedSfxMute === 'true';
+        this.bgmMuted = false;
+        this.sfxMuted = false;
+        try {
+            this.bgmMuted = localStorage.getItem('match3_bgm_muted') === 'true';
+            this.sfxMuted = localStorage.getItem('match3_sfx_muted') === 'true';
+        } catch {
+            // 儲存不可用時維持預設設定，不阻止遊戲初始化。
+        }
 
         this.masterVolume = 0.3; // 整體音量
         this.bgmNode = null;
@@ -168,7 +171,11 @@ export class AudioManager {
 
     toggleBGM() {
         this.bgmMuted = !this.bgmMuted;
-        localStorage.setItem('match3_bgm_muted', this.bgmMuted);
+        try {
+            localStorage.setItem('match3_bgm_muted', this.bgmMuted);
+        } catch {
+            // 設定仍在本次遊戲生效。
+        }
         if (this.bgmMuted) {
             this.stopBGM();
         } else {
@@ -179,7 +186,11 @@ export class AudioManager {
 
     toggleSFX() {
         this.sfxMuted = !this.sfxMuted;
-        localStorage.setItem('match3_sfx_muted', this.sfxMuted);
+        try {
+            localStorage.setItem('match3_sfx_muted', this.sfxMuted);
+        } catch {
+            // 設定仍在本次遊戲生效。
+        }
         return this.sfxMuted;
     }
 
