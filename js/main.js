@@ -141,6 +141,8 @@ function init() {
     // 初始化輸入處理
     const inputHandler = new InputHandler(canvas, renderer, ({ row, col }) => {
         game.handleClick(row, col);
+    }, (from, to) => {
+        game.handleSwipe(from.row, from.col, to.row, to.col);
     });
 
     // 遊戲主循環

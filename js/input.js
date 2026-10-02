@@ -12,13 +12,15 @@
  *
  * @param {HTMLCanvasElement} canvas
  * @param {import('./renderer.js').Renderer} renderer
- * @param {function({row: number, col: number})} onClick 點擊/滑動回呼
+ * @param {function({row: number, col: number})} onClick 點擊回呼
+ * @param {function(object, object)} onSwipe 滑動起點與終點回呼
  */
 export class InputHandler {
-    constructor(canvas, renderer, onClick) {
+    constructor(canvas, renderer, onClick, onSwipe) {
         this.canvas = canvas;
         this.renderer = renderer;
         this.onClick = onClick;
+        this.onSwipe = onSwipe;
         this.enabled = true;
 
         // 觸控起始點紀錄（用於 swipe 偵測）
@@ -82,12 +84,7 @@ export class InputHandler {
                 targetRow = dy > 0 ? r + 1 : r - 1;
             }
 
-            // 先觸發起始格的選取，再觸發目標格
-            this.onClick({ row: r, col: c });
-            // 略延遲，讓 game 先記錄 selectedGem
-            requestAnimationFrame(() => {
-                this.onClick({ row: targetRow, col: targetCol });
-            });
+            this.onSwipe?.({ row: r, col: c }, { row: targetRow, col: targetCol });
         }
 
         this._touchStart = null;

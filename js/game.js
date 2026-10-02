@@ -390,6 +390,18 @@ export class Game {
         }
     }
 
+    /** 滑動直接使用手勢起終點，不依賴先前點選狀態 */
+    handleSwipe(r1, c1, r2, c2) {
+        if (this.animating || this.state === GameState.GAME_OVER) return;
+        const size = this.board.size;
+        if (![r1, c1, r2, c2].every(value => Number.isInteger(value) && value >= 0 && value < size)) return;
+        if (!this.board.isAdjacent(r1, c1, r2, c2)) return;
+
+        this._resetHintTimer();
+        this.selectedGem = null;
+        return this._trySwap(r1, c1, r2, c2);
+    }
+
     /** 嘗試交換兩個方塊 */
     async _trySwap(r1, c1, r2, c2) {
         const session = this._session;
