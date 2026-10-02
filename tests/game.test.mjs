@@ -3,6 +3,41 @@ import assert from 'node:assert/strict';
 import { Game, frameClock } from './helpers.mjs';
 
 for (const phase of ['swap', 'reverse', 'remove', 'fall']) {
+    test(`計時結束會停止 ${phase} 階段的棋盤與分數變更`, async t => {
+        const tick = frameClock(t);
+        let score = 0;
+        let finalScore;
+        const game = new Game({
+            onScoreUpdate: (points, reset) => { score = reset ? 0 : score + points; },
+            onGameOver: () => { finalScore = score; },
+        });
+        t.after(() => game.destroy());
+        let timer;
+        t.mock.method(globalThis, 'setInterval', fn => { timer = fn; return 1; });
+        game.startGame('timed');
+        game.board.grid = Array.from({ length: 7 }, (_, r) =>
+            Array.from({ length: 7 }, (_, c) => (r + c) % 6 + 1));
+        game.board.grid[0] = [1, 1, 2, 4, 5, 6, 1];
+        game.board.grid[1][2] = 1;
+        const move = phase === 'reverse' ? game._trySwap(6, 5, 6, 6) : game._trySwap(0, 2, 1, 2);
+        if (phase !== 'swap') await tick();
+        if (phase === 'fall') await tick();
+        game.timerSeconds = 1;
+        timer();
+        const ended = structuredClone(game.board.grid);
+        for (let i = 0; i < 50; i++) await tick();
+        await move;
+        assert.equal(game.state, 'gameOver');
+        assert.equal(score, finalScore);
+        assert.deepEqual(game.board.grid, ended);
+        assert.equal(game.hintTimer, null);
+        assert.equal(game.isAutoPlaying, false);
+        game.handleClick(0, 0);
+        assert.equal(game.selectedGem, null);
+    });
+}
+
+for (const phase of ['swap', 'reverse', 'remove', 'fall']) {
     test(`重新開始會隔離上一局的 ${phase} 動畫與棋盤變更`, async t => {
         const tick = frameClock(t);
         const game = new Game();

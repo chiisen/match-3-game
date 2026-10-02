@@ -564,10 +564,16 @@ export class Game {
 
     /** 遊戲結束 */
     _gameOver() {
+        this._session++;
         this._clearTimers();
         this.state = GameState.GAME_OVER;
         this.animating = false;
         this.isAutoPlaying = false;
+        this.selectedGem = null;
+        this.hintTarget = null;
+        this.swapAnim = null;
+        this.removeAnim = null;
+        this.fallAnim = null;
         this.callbacks.onStateChange?.(this.state);
         this.callbacks.onGameOver?.();
     }
@@ -604,6 +610,7 @@ export class Game {
 
     /** 切換電腦代玩模式 */
     toggleAutoPlay() {
+        if (this.state === GameState.GAME_OVER) return false;
         this.isAutoPlaying = !this.isAutoPlaying;
         if (this.isAutoPlaying && this.state === GameState.IDLE && !this.animating) {
             this._triggerAutoMove();
