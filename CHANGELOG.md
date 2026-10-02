@@ -6,6 +6,7 @@
 
 ### 文件
 
+- 將 `.agent_task_state.md` 納入版本控制，記錄已完成任務及驗證範圍。
 - README 補上本機遊戲網址 `http://localhost:8000`，並提供印出完整網址的 PowerShell 啟動指令。
 
 ### 修正
