@@ -2,6 +2,37 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Game, frameClock } from './helpers.mjs';
 
+test('死盤重建保留累積分數與剩餘秒數，只有新局重設分數', async t => {
+    const tick = frameClock(t);
+    let score = 120;
+    const game = new Game({ onScoreUpdate: (points, reset) => { score = reset ? 0 : score + points; } });
+    t.after(() => game.destroy());
+    game.mode = 'timed';
+    game.timerSeconds = 27;
+    game.board.grid = Array.from({ length: 7 }, (_, r) =>
+        Array.from({ length: 7 }, (_, c) => (r + c) % 6 + 1));
+    game.board.grid[0] = [1, 1, 4, 4, 5, 6, 1];
+    game.board.grid[1][2] = 1;
+    // 補入 1、2、3 後整個棋盤形成無三連、無可用步驟的循環排列。
+    const randomType = game.board._randomType.bind(game.board);
+    const refill = [1, 2, 3];
+    game.board._randomType = () => refill.length ? refill.shift() : randomType();
+    const move = game._trySwap(0, 2, 1, 2);
+    await tick();
+    await tick();
+    assert.equal(game.board.findMatches().size, 0);
+    assert.equal(game.board.hasValidMoves(), false);
+    await tick();
+    await move;
+    assert.equal(score, 150);
+    assert.equal(game.timerSeconds, 27);
+    assert.equal(game.mode, 'timed');
+    assert.equal(game.board.findMatches().size, 0);
+    assert.equal(game.board.hasValidMoves(), true);
+    game.startGame();
+    assert.equal(score, 0);
+});
+
 for (const phase of ['swap', 'reverse', 'remove', 'fall']) {
     test(`計時結束會停止 ${phase} 階段的棋盤與分數變更`, async t => {
         const tick = frameClock(t);

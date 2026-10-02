@@ -429,7 +429,6 @@ export class Game {
         if (!this.board.hasValidMoves()) {
             // 無法消除，重新生成棋盤直到有可用步驟
             this.board.generateBoard();
-            this.callbacks.onScoreUpdate?.(0, true);
             this.combo = 0;
             this.callbacks.onComboUpdate?.(0);
             this.state = GameState.IDLE;
