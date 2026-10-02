@@ -50,10 +50,12 @@
 ## 🚀 快速開始
 
 1. ⚙️ 確保電腦已安裝 [Node.js](https://nodejs.org/)。
-2. 💻 使用 VS Code 的 [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 或以下指令開啟本機服務：
-   ```bash
-   python -m http.server
+2. 💻 使用 VS Code 的 [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)，或在專案根目錄使用 Python 開啟本機服務（需安裝 Python）：
+   ```powershell
+   Write-Host '遊戲網址：http://localhost:8000'
+   python -m http.server 8000
    ```
+   第一行會在 PowerShell 印出完整網址。服務啟動後，在瀏覽器開啟 [http://localhost:8000](http://localhost:8000) 即可遊玩。終端機需保持開啟，按 `Ctrl+C` 停止服務。
 3. ☁️ 部署至 Cloudflare：
    ```bash
    npm install -g wrangler
