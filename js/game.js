@@ -313,6 +313,9 @@ export class Game {
         this.hintTarget = null;
         this.isAutoPlaying = false;
 
+        // 每次開新局遞增，阻止上一局的非同步流程修改新棋盤。
+        this._session = 0;
+
         // 動畫相關狀態
         this.animating = false;
         this.swapAnim = null;   // { r1, c1, r2, c2, progress, reverse }
@@ -322,6 +325,7 @@ export class Game {
 
     /** 開始新遊戲 */
     startGame(mode = 'classic') {
+        this._session++;
         this.mode = mode;
         this.board.generateBoard();
         this.state = GameState.IDLE;
@@ -388,12 +392,14 @@ export class Game {
 
     /** 嘗試交換兩個方塊 */
     async _trySwap(r1, c1, r2, c2) {
+        const session = this._session;
         this.animating = true;
         this.state = GameState.SWAPPING;
         this.callbacks.onStateChange?.(this.state);
 
         // 播放交換動畫
         await this._animateSwap(r1, c1, r2, c2);
+        if (session !== this._session) return;
 
         // 執行交換
         this.board.swap(r1, c1, r2, c2);
@@ -404,6 +410,7 @@ export class Game {
         if (matches.size === 0) {
             // 無效交換 → 回退
             await this._animateSwap(r2, c2, r1, c1);
+            if (session !== this._session) return;
             this.board.swap(r1, c1, r2, c2);
             this.selectedGem = null;
             this.state = GameState.IDLE;
@@ -416,6 +423,7 @@ export class Game {
         this.selectedGem = null;
         this.combo = 0;
         await this._processMatches(matches);
+        if (session !== this._session) return;
 
         // 檢查是否還有可用步驟
         if (!this.board.hasValidMoves()) {
@@ -440,6 +448,7 @@ export class Game {
 
     /** 處理消除連鎖 */
     async _processMatches(matches) {
+        const session = this._session;
         while (matches.size > 0) {
             this.combo++;
             this.callbacks.onComboUpdate?.(this.combo);
@@ -454,6 +463,7 @@ export class Game {
             this.state = GameState.REMOVING;
             this.callbacks.onStateChange?.(this.state);
             await this._animateRemove(matches);
+            if (session !== this._session) return;
 
             // 移除方塊
             this.board.removeMatches(matches);
@@ -464,6 +474,7 @@ export class Game {
             const moves = this.board.applyGravity();
             const newGems = this.board.fillEmpty();
             await this._animateFall(moves, newGems);
+            if (session !== this._session) return;
 
             // 再次檢查連鎖
             matches = this.board.findMatches();
@@ -487,11 +498,13 @@ export class Game {
 
     /** 交換動畫 */
     _animateSwap(r1, c1, r2, c2) {
+        const session = this._session;
         return new Promise((resolve) => {
             this.swapAnim = { r1, c1, r2, c2, progress: 0 };
             const duration = 200; // ms
             const start = performance.now();
             const animate = (now) => {
+                if (session !== this._session) { resolve(); return; }
                 const elapsed = now - start;
                 this.swapAnim.progress = Math.min(elapsed / duration, 1);
                 if (this.swapAnim.progress < 1) {
@@ -507,11 +520,13 @@ export class Game {
 
     /** 消除動畫 */
     _animateRemove(cells) {
+        const session = this._session;
         return new Promise((resolve) => {
             this.removeAnim = { cells, progress: 0 };
             const duration = 300;
             const start = performance.now();
             const animate = (now) => {
+                if (session !== this._session) { resolve(); return; }
                 const elapsed = now - start;
                 this.removeAnim.progress = Math.min(elapsed / duration, 1);
                 if (this.removeAnim.progress < 1) {
@@ -527,11 +542,13 @@ export class Game {
 
     /** 掉落動畫 */
     _animateFall(moves, newGems) {
+        const session = this._session;
         return new Promise((resolve) => {
             this.fallAnim = { moves, newGems, progress: 0 };
             const duration = 300;
             const start = performance.now();
             const animate = (now) => {
+                if (session !== this._session) { resolve(); return; }
                 const elapsed = now - start;
                 this.fallAnim.progress = Math.min(elapsed / duration, 1);
                 if (this.fallAnim.progress < 1) {
@@ -596,13 +613,14 @@ export class Game {
 
     /** 觸發自動移動 */
     async _triggerAutoMove() {
+        const session = this._session;
         if (!this.isAutoPlaying || this.state !== GameState.IDLE || this.animating) return;
 
         const hint = this.board.findHint();
         if (hint) {
             // 延遲一點點，讓代玩看起來比較像人在點
             await new Promise(r => setTimeout(r, 600));
-            if (this.isAutoPlaying && this.state === GameState.IDLE) {
+            if (session === this._session && this.isAutoPlaying && this.state === GameState.IDLE) {
                 this._trySwap(hint.r1, hint.c1, hint.r2, hint.c2);
             }
         }
@@ -610,6 +628,7 @@ export class Game {
 
     /** 銷毀遊戲（清理資源） */
     destroy() {
+        this._session++;
         this._clearTimers();
     }
 }
